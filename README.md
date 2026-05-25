@@ -34,15 +34,23 @@ Accessibility) and restart the server.
 | TAB left   | J          | Previous tab         |
 | TAB right  | K          | Next tab             |
 | ESC        | esc        | Clear Vimium / focus |
+| top arrow  | gg         | Scroll to top        |
 | PG up      | u          | Half-page up         |
 | PG down    | d          | Half-page down       |
-| top arrow  | gg         | Scroll to top        |
 | bot arrow  | G          | Scroll to bottom     |
+| reload     | r          | Reload page          |
 
-Tab switching and the scroll-jump buttons rely on Vimium being loaded
-on the active tab. They will not work on `chrome://` pages or the new
-tab page.
+The button commands rely on Vimium being loaded on the active tab. They
+will not work on `chrome://` pages or the new tab page.
 
+Connection state lives on the pad itself: the border turns amber and
+the hint reads "reconnecting…" while the WebSocket is down, then goes
+back to normal once reconnected.
+
+### Disclaimer 
+For reasons I'm not sure of atm, the scroll trackpad sometimes does not work
+Trying pressing esc and reloading the page through the reload button. 
+The page up and down button can be used reliably instead if such is the case. 
 ## How it works
 
 - `aiohttp` serves an HTML page with a touch pad and button grid.

@@ -1,11 +1,3 @@
-"""Tiny server that turns an iPhone into a scroll trackpad + Vimium remote.
-
-Run:  python phone_remote.py
-Then open the printed URL in Safari on the iPhone (same Wi-Fi).
-
-macOS will prompt for Accessibility permission for the terminal/Python
-on first event — grant it and rerun.
-"""
 
 import json
 import socket
@@ -49,7 +41,7 @@ INDEX_HTML: Final[str] = """<!doctype html>
     }
     .row { display: grid; gap: 6px; }
     .row.primary   { grid-template-columns: 1fr 1fr 1fr; }
-    .row.secondary { grid-template-columns: 0.7fr 1fr 1fr 0.7fr; }
+    .row.secondary { grid-template-columns: 0.7fr 1fr 1fr 0.7fr 0.7fr; }
 
     .btn {
       background: #15151a; color: #ddd;
@@ -67,7 +59,7 @@ INDEX_HTML: Final[str] = """<!doctype html>
     .row.secondary .btn .sub { font-size: 8px; }
 
     #pad-wrap {
-      flex: 1; padding: 8px 8px calc(6px + env(safe-area-inset-bottom)) 8px;
+      flex: 1; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)) 8px;
       display: flex;
     }
     #pad {
@@ -76,21 +68,10 @@ INDEX_HTML: Final[str] = """<!doctype html>
       border: 1px solid #303038; border-radius: 14px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
       font-size: 12px; letter-spacing: 0.5px; color: #6a6a72;
-      transition: background 120ms, color 120ms;
+      transition: background 120ms, color 120ms, border-color 200ms;
     }
     #pad.active { background: #2a2a32; color: #c0c0c8; }
-
-    #status {
-      padding: 6px env(safe-area-inset-right) calc(6px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
-      font-size: 10.5px; text-align: center; color: #555;
-    }
-    .dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: #444; display: inline-block;
-      margin-right: 6px; vertical-align: middle;
-      transition: background 200ms;
-    }
-    .dot.connected { background: #4ade80; }
+    #pad.disconnected { border-color: #6b4a1a; color: #c9994a; }
   </style>
 </head>
 <body>
@@ -105,33 +86,31 @@ INDEX_HTML: Final[str] = """<!doctype html>
       <div class="btn" data-cmd="page_up">PG ↑<span class="sub">u</span></div>
       <div class="btn" data-cmd="page_down">PG ↓<span class="sub">d</span></div>
       <div class="btn" data-cmd="bottom">⤓<span class="sub">G</span></div>
+      <div class="btn" data-cmd="reload">↻<span class="sub">r</span></div>
     </div>
   </div>
 
   <div id="pad-wrap">
-    <div id="pad">drag to scroll</div>
+    <div id="pad" class="disconnected">connecting…</div>
   </div>
-
-  <div id="status"><span class="dot" id="dot"></span><span id="state">connecting…</span></div>
 
   <script>
     const pad = document.getElementById('pad');
-    const dot = document.getElementById('dot');
-    const stateEl = document.getElementById('state');
     let ws = null;
     let lastY = null;
     let pendingDy = 0;
     let rafScheduled = false;
 
+    function setConnected(ok) {
+      pad.classList.toggle('disconnected', !ok);
+      pad.textContent = ok ? 'drag to scroll' : 'reconnecting…';
+    }
+
     function connect() {
       const proto = location.protocol === 'https:' ? 'wss' : 'ws';
       ws = new WebSocket(`${proto}://${location.host}/ws`);
-      ws.onopen = () => { dot.classList.add('connected'); stateEl.textContent = 'connected'; };
-      ws.onclose = () => {
-        dot.classList.remove('connected');
-        stateEl.textContent = 'reconnecting…';
-        setTimeout(connect, 800);
-      };
+      ws.onopen = () => setConnected(true);
+      ws.onclose = () => { setConnected(false); setTimeout(connect, 800); };
       ws.onerror = () => ws && ws.close();
     }
     connect();
@@ -207,6 +186,8 @@ def run_command(kb: KeyboardController, name: str) -> None:
             kb.press("j"); kb.release("j")
     elif name == "esc":
         kb.press(Key.esc); kb.release(Key.esc)
+    elif name == "reload":
+        kb.press("r"); kb.release("r")
     else:
         print(f"[warn] unknown cmd: {name}")
 
