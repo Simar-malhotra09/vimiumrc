@@ -6,6 +6,9 @@ send Vimium key commands (tab switch, half-page scroll, top/bottom).
 
 ## Setup
 
+You will need to have the [vimium chrome extension](https://github.com/philc/vimium) installed.
+Play around with it using you keyboard as it intends first if you've never used [vim](https://en.wikipedia.org/wiki/Vim_(text_editor))
+
 Phone and laptop must be on the same Wi-Fi.
 
 ```
@@ -48,6 +51,8 @@ tab page.
   scroll wheel events.
 - Button taps send `{type: "cmd", name}`. The server synthesizes the
   matching keystroke via `pynput`.
+- Vimium handles the rest, since these keyinputs are indistinguishable 
+  from regular keystrokes.
 
 ## Tuning
 
