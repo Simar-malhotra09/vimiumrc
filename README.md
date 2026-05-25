@@ -51,6 +51,8 @@ back to normal once reconnected.
 For reasons I'm not sure of atm, the scroll trackpad sometimes does not work
 Trying pressing esc and reloading the page through the reload button. 
 The page up and down button can be used reliably instead if such is the case. 
+
+
 ## How it works
 
 - `aiohttp` serves an HTML page with a touch pad and button grid.
