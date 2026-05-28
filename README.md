@@ -5,6 +5,8 @@ Drag on the phone to scroll the active window on the laptop. Buttons
 send Vimium key commands (tab switch, half-page scroll, top/bottom).
 
 <img src="./vimium-remote.jpeg" alt="UI" width="50%">
+
+
 ## Setup
 
 You will need to have the [vimium chrome extension](https://github.com/philc/vimium) installed.
